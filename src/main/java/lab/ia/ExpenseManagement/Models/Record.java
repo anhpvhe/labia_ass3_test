@@ -43,7 +43,7 @@ public class Record {
     @DateTimeFormat(pattern = "dd/MM/yyyy hh:mm:ss")
     private Date date;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "category_records", joinColumns = @JoinColumn(name = "record_id"), inverseJoinColumns = @JoinColumn(name = "category_id"))
     @EqualsAndHashCode.Exclude
     @ToString.Exclude

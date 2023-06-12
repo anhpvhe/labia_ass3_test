@@ -38,7 +38,7 @@ public class Category {
     @JsonIgnore
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
-    @ManyToMany(mappedBy = "categories", cascade = CascadeType.ALL)
+    @ManyToMany(mappedBy = "categories")
     private List<Record> records = new ArrayList<>();
 
     public Category(String name, String description, User user) {
