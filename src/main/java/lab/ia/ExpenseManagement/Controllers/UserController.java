@@ -23,6 +23,11 @@ public class UserController {
         return ResponseEntity.ok(userService.getCurrentUserInfo(currentUser));
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
+    }
+
     @GetMapping("/checkUsernameAvailability")
     public ResponseEntity<?> checkUsernameAvailability(@RequestParam("username") String username) {
         return ResponseEntity.ok(userService.checkUsernameAvailable(username));

@@ -49,6 +49,11 @@ public class UserServerImpl implements UserService {
         boolean isAvailable = !userRepository.existsByEmail(email);
         return new UserIdentityAvailabilityResponse(isAvailable);
     }
+    @PreAuthorize("hasRole('ADMIN')")
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
 
     @PreAuthorize("#username == principal.username || hasRole('ADMIN')")
     @Override
