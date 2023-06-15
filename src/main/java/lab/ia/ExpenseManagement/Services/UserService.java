@@ -9,6 +9,7 @@ import lab.ia.ExpenseManagement.Payloads.Response.UserResponse;
 import lab.ia.ExpenseManagement.Security.UserPrincipal;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
     UserResponse getCurrentUserInfo(UserPrincipal currentUser);
@@ -18,6 +19,8 @@ public interface UserService {
     UserIdentityAvailabilityResponse checkEmailAvailable(String password);
 
     List<User> getAllUsers();
+
+    Optional<User> getUserById(Long id);
 
     ApiResponse updateUser(String username, UserInfoRequest newUserInfo);
 

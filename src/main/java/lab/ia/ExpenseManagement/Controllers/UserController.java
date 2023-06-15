@@ -1,6 +1,9 @@
 package lab.ia.ExpenseManagement.Controllers;
 
 import jakarta.validation.Valid;
+import lab.ia.ExpenseManagement.Models.Enums.ERole;
+import lab.ia.ExpenseManagement.Payloads.Request.GiveRoleRequest;
+import lab.ia.ExpenseManagement.Payloads.Request.RecordRequest;
 import lab.ia.ExpenseManagement.Payloads.Request.UserInfoRequest;
 import lab.ia.ExpenseManagement.Security.CurrentUser;
 import lab.ia.ExpenseManagement.Security.UserPrincipal;
@@ -28,6 +31,12 @@ public class UserController {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getOneById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(userService.getUserById(id));
+    }
+
     @GetMapping("/checkUsernameAvailability")
     public ResponseEntity<?> checkUsernameAvailability(@RequestParam("username") String username) {
         return ResponseEntity.ok(userService.checkUsernameAvailable(username));
@@ -36,6 +45,22 @@ public class UserController {
     @GetMapping("/checkEmailAvailability")
     public ResponseEntity<?> checkEmailAvailability(@RequestParam("email") String email) {
         return ResponseEntity.ok(userService.checkEmailAvailable(email));
+    }
+
+    @PostMapping("/giverole")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> giveRole(@RequestBody GiveRoleRequest userProfile) {
+        String username = userProfile.getUsername();
+        ERole role = userProfile.getRole();
+        return ResponseEntity.ok(userService.giveRoleByUsername(username, role));
+    }
+
+    @PostMapping("/removerole")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> removeRole(@RequestBody GiveRoleRequest userProfile) {
+        String username = userProfile.getUsername();
+        ERole role = userProfile.getRole();
+        return ResponseEntity.ok(userService.takeRoleByUsername(username, role));
     }
 
     @DeleteMapping("/{username}")
