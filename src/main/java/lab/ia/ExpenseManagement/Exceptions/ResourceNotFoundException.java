@@ -25,6 +25,9 @@ public class ResourceNotFoundException extends RuntimeException{
         setErrorResponse();
     }
 
+    public ResourceNotFoundException(String record, String id, Long id1) {
+    }
+
     public void setErrorResponse() {
         this.apiResponse = new ApiResponse(false, String.format("%s not found with %s: %s", resourceName, fieldName, fieldValue));
     }

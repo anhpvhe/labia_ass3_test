@@ -58,4 +58,7 @@ public class Record {
         this.date = date;
         this.categories = categories;
     }
+
+
+
 }

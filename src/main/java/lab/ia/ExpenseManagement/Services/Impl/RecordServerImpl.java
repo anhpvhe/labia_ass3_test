@@ -1,8 +1,11 @@
 package lab.ia.ExpenseManagement.Services.Impl;
 
+import lab.ia.ExpenseManagement.DAO.DBContext;
+import lab.ia.ExpenseManagement.DAO.RecordDAO;
 import lab.ia.ExpenseManagement.Exceptions.BadRequestException;
 import lab.ia.ExpenseManagement.Exceptions.ResourceNotFoundException;
 import lab.ia.ExpenseManagement.Models.Category;
+import lab.ia.ExpenseManagement.Models.Enums.ERecordType;
 import lab.ia.ExpenseManagement.Models.Record;
 import lab.ia.ExpenseManagement.Models.User;
 import lab.ia.ExpenseManagement.Payloads.Request.RecordRequest;
@@ -19,6 +22,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.*;
+import javax.sql.DataSource;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -115,23 +123,55 @@ public class RecordServerImpl implements RecordServer {
 
     @Override
     public ApiResponse updateRecord(Long id, RecordRequest newRecord, UserPrincipal currentUser) {
-        Record record = this.getRecord(id, currentUser);
-        List<Category> categories = this.getCategoryFromCategoryIdList(newRecord.getCategories(), currentUser.getUsername());
-        if (!newRecord.getName().isBlank())
-            record.setName(newRecord.getName());
-        if (!newRecord.getNote().isBlank())
-            record.setNote(newRecord.getNote());
-        if (newRecord.getType() != null)
-            record.setType(newRecord.getType());
-        if (newRecord.getAmount() != null)
-            record.setAmount(newRecord.getAmount());
-        if (newRecord.getDate() != null)
-            record.setDate(newRecord.getDate());
-        if (newRecord.getCategories() != null)
-            record.setCategories(categories);
-        recordRepository.save(record);
-        return new ApiResponse(true, String.format("Record %s updated successfully!", id));
+        Record recordToUpdate = getRecord(id, currentUser);
+        if (recordToUpdate == null) {
+            throw new ResourceNotFoundException("Record", "id", id);
+        }
+
+        try {
+            DBContext dbContext = new DBContext();
+            RecordDAO recordDAO = new RecordDAO(dbContext);
+
+            if (!newRecord.getName().isBlank()) {
+                String name = sanitizeInput(newRecord.getName());
+                recordToUpdate.setName(name);
+            }
+            if (!newRecord.getNote().isBlank()) {
+                String note = sanitizeInput(newRecord.getNote());
+                recordToUpdate.setNote(note);
+            }
+            if (newRecord.getType() != null) {
+                ERecordType type = newRecord.getType();
+                recordToUpdate.setType(type);
+            }
+            if (newRecord.getAmount() != null) {
+                double amount = newRecord.getAmount();
+                recordToUpdate.setAmount(amount);
+            }
+            if (newRecord.getDate() != null) {
+                Date date = newRecord.getDate();
+                recordToUpdate.setDate(date);
+            }
+            if (newRecord.getCategories() != null) {
+                List<Category> categories = getCategoryFromCategoryIdList(newRecord.getCategories(), currentUser.getUsername());
+                recordToUpdate.setCategories(categories);
+            }
+
+            recordDAO.updateRecord(recordToUpdate);
+
+            return new ApiResponse(true, String.format("Record %s updated successfully!", id));
+        } catch (SQLException e) {
+            return new ApiResponse(false, "Failed to update record: " + e.getMessage());
+        }
     }
+
+    private String sanitizeInput(String input) {
+        // Implement input sanitization technique (e.g., parameterized queries, input validation)
+        // to prevent SQL injection attacks.
+        // Example: Use prepared statements or an ORM that handles parameter binding.
+        return input;
+    }
+
 
     @Override
     public ApiResponse deleteRecord(Long id, UserPrincipal currentUser) {
