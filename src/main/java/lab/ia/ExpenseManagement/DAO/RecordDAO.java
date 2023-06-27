@@ -18,15 +18,15 @@ public class RecordDAO {
     }
 
     public void updateRecord(Record record) throws SQLException {
-        String sql = "UPDATE records SET name = ?, note = ?, type = ?, amount = ?, date = ? WHERE id = ?";
+        String name = record.getName();
+        String note = record.getNote();
+        String type = String.valueOf(record.getType());
+        String amount = String.valueOf(record.getAmount());
+        String date = String.valueOf(new java.sql.Date(record.getDate().getTime()));
+        String id = String.valueOf(record.getId());
+        String sql = "UPDATE records SET name = " + name + ", note = " + note + ", type = "+type+", amount = "+amount+", date = "+date+" WHERE id = "+id+"";
         try (Connection connection = dbContext.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
-            statement.setString(1, record.getName());
-            statement.setString(2, record.getNote());
-            statement.setString(3, String.valueOf(record.getType()));
-            statement.setDouble(4, record.getAmount());
-            statement.setDate(5, new java.sql.Date(record.getDate().getTime()));
-            statement.setLong(6, record.getId());
             statement.executeUpdate();
         }
     }
